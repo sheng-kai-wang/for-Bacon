@@ -196,6 +196,8 @@ def plot_stcok_k2_chart(IMGUR_CLIENT_ID, stock, start_date):
     # 時間短，日期間距變小
     step_const = 25
     date_step = int(len(df.index)/step_const)
+    if (date_step<1):
+        date_step = 1
     print('date_step: ', date_step)
 
     mpl.volume_overlay(ax3, df['Open'], df['Close'], df['Volume'], colorup='r', colordown='g', width=0.5, alpha=0.8)
