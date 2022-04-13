@@ -192,8 +192,8 @@ def plot_stcok_k2_chart(IMGUR_CLIENT_ID, stock, start_date):
     ax2.plot(df['d'], label='D')
 
     # date_step 與 len(df.index) 成正比
-    # 時間長，日期區間變短
-    # 時間短，日期區間變長
+    # 時間長，日期間距變大
+    # 時間短，日期間距變小
     step_const = 25
     date_step = int(len(df.index)/step_const)
     print('date_step: ', date_step)
