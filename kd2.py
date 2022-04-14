@@ -1,36 +1,19 @@
 from config import *
+from crawl import *
+
 # basic
 import numpy as np
-import pandas as pd
 import pyimgur
-
-# get data
-import pandas_datareader as pdr
 
 # visual
 import matplotlib.pyplot as plt
 import mpl_finance as mpl
-import mplfinance as mpf
-import matplotlib.ticker as ticker
-import matplotlib.ticker as FormatStrFormatter
 
-#%matplotlib inline
-import seaborn as sns
-
-# import seaborn as sns 
-from bs4 import BeautifulSoup
-
-#time
-import datetime as datetime
-
-#talib
+# talib
 import talib
-import pandas as pd
-import requests,datetime
-from matplotlib.font_manager import FontProperties # 設定字體
 
+# data
 import yfinance as yf
-
 
 def plot_stcok_k2_chart(IMGUR_CLIENT_ID, stock, start_date):
     
@@ -40,17 +23,10 @@ def plot_stcok_k2_chart(IMGUR_CLIENT_ID, stock, start_date):
 
     stock = str(stock)+".tw"
 
-    #start_date='2021-01-01'
-    #stock = "3008.tw"
-
-
     yf.pdr_override()
-    #end = datetime.datetime.now()
-   # df = pdr.get_data_yahoo(stock, start_date)#end)
 
     df = yf.download(stock, start_date)
     df.index = df.index.format(formatter=lambda x: x.strftime('%Y-%m-%d')) 
-   
 
 
     sma_5 = talib.SMA(np.array(df['Close']), 5)
@@ -69,8 +45,6 @@ def plot_stcok_k2_chart(IMGUR_CLIENT_ID, stock, start_date):
 
 
     ax  = fig.add_axes([0,0.4,2,0.5])  #左下座標(0,0.2)  寬高(1,0.5)
-
-
 
 
     for lobj in ax.get_yticklabels():
@@ -94,7 +68,7 @@ def plot_stcok_k2_chart(IMGUR_CLIENT_ID, stock, start_date):
         lobj.set_color('black')
 
 
-    ax3 = fig.add_axes([0,0,  2,0.2])  #
+    ax3 = fig.add_axes([0,0,  2,0.2])
 
 
     #設定y軸值，名稱，字體大小
@@ -107,19 +81,12 @@ def plot_stcok_k2_chart(IMGUR_CLIENT_ID, stock, start_date):
         lobj.set_size(40)
         lobj.set_color('black')
         
-    ax.set_xticks(range(0, len(df.index), 10))
-    ax.set_xticklabels(df.index[::10])
-
-
 
     mpl.candlestick2_ochl(ax, df['Open'], df['Close'], df['High'],
                         df['Low'], width=0.6, colorup='r', colordown='g', alpha=0.75)
- 
-
-
 
     #圖例
-    ax.plot(sma_5, label='5MA')
+    ax.plot(sma_5, label=' 5MA')
     ax.plot(sma_10, label='10MA')
     ax.plot(sma_30, label='30MA')
     ax.plot(sma_60, label='60MA')
@@ -128,24 +95,22 @@ def plot_stcok_k2_chart(IMGUR_CLIENT_ID, stock, start_date):
     ax2.plot(df['k'], label='K')
     ax2.plot(df['d'], label='D')
 
-    ax2.set_xticks(range(0, len(df.index), 10))
-    ax2.set_xticklabels(df.index[::10])
+
+    parts = 8 # 切出八個日期
+    date_step = 1 # 預設的日期間隔
+    date_list = df.index # 預設的日期資料
+    if (len(date_list) > parts): # 如果資料超過八筆，就切出八個日期
+        date_step = int(len(date_list)/(parts-1)) # 日期間隔
+        date_list = date_list[::date_step].values # 日期資料
+        date_list[-1] = df.index[-1] # 最後一筆一定是今天日期
 
 
     mpl.volume_overlay(ax3, df['Open'], df['Close'], df['Volume'], colorup='r', colordown='g', width=0.5, alpha=0.8)
-    ax3.set_xticks(range(0, len(df.index), 10))
+    ax3.set_xticks(range(0, len(df.index), date_step))
+    ax3.set_xticklabels(date_list, fontsize=60, rotation=35)
 
-   # tick_spacing = df.index.size/10 # x軸密集度
-
-    #ax3.xaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
-    ax3.set_xticklabels(df.index[::10],fontsize=60,rotation=35)
-
-
-
-
-    ax.legend( fontsize=35);
-    ax2.legend( fontsize=30);
-
+    ax.legend( fontsize=35)
+    ax2.legend( fontsize=30)
 
    
     fig.savefig(PATH,bbox_inches='tight')
