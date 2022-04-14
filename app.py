@@ -35,6 +35,8 @@ def callback():
 
     # handle webhook body
     try:
+        print('body', body)
+        print('signature', signature)
         handler.handle(body, signature)
     except InvalidSignatureError:
         print("Invalid signature. Please check your channel access token/channel secret.")
@@ -55,9 +57,12 @@ def handle_message(event):
         stock_name = input_word[0:4]  # 2330
         start_date = input_word[4:]  # 2020-01-01
         content = plot_stcok_k2_chart(IMGUR_CLIENT_ID, stock_name, start_date)
-        message = ImageSendMessage(
-            original_content_url=content, preview_image_url=content)
-        line_bot_api.reply_message(event.reply_token, message)
+        try:
+            message = ImageSendMessage(
+                original_content_url=content, preview_image_url=content)
+            line_bot_api.reply_message(event.reply_token, message)
+        except:
+            line_bot_api.reply_message(event.reply_token, TextSendMessage(text=content))
         
     
     elif "即時新聞" in message:
